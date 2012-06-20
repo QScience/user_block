@@ -53,19 +53,21 @@ function user_block_block_info() {
  * Implements hook_block_view().
  */
 function user_block_block_view($delta) {
-  global  $base_path, $base_url, $language;
+  global  $user, $base_path, $base_url, $language;
   $uid=-1;
+  $block = array();
   if ( arg(0) == 'node' and is_numeric(arg(1)) and arg(2) == FALSE ) {
   	$node=node_load(arg(1));
   	$uid=($node->uid);
+  	$block['subject']=t('Submitted by');
+  }else{
+  	$uid=$user->uid;
   }
   if ($uid < 1) { 
   	 return false;
   }
   $user=user_load($uid);
   $_moduleName_='user_block';
-  $block = array();
-  $block['subject']=t('Submitted by');
 
   $img_prefix=$base_url . "/" . variable_get('file_public_path', conf_path() . '/files');
 
