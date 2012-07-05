@@ -58,15 +58,19 @@ function user_block_block_view($delta) {
   $block = array();
   if ( arg(0) == 'node' and is_numeric(arg(1)) and arg(2) == FALSE ) {
   	$node=node_load(arg(1));
-  	$uid=($node->uid);
-  	$block['subject']=t('Submitted by');
+  	if($node->type=="article"){
+  		$uid=$user->uid;
+  	}else{
+  		$uid=($node->uid);
+  		$block['subject']=t('Submitted by');
+  	}
   }else{
   	$uid=$user->uid;
   }
   if ($uid < 1) { 
   	 return false;
   }
-  $user=user_load($uid);
+  $puser=user_load($uid);
   $_moduleName_='user_block';
 
   $img_prefix=$base_url . "/" . variable_get('file_public_path', conf_path() . '/files');
@@ -76,7 +80,7 @@ function user_block_block_view($delta) {
 
   
 
-  $variables['account'] = $user;
+  $variables['account'] = $puser;
   $variables['user_picture'] = '';
   template_preprocess_user_picture($variables);
   //$block['content'] .= "<div class=picture>";
@@ -85,15 +89,15 @@ function user_block_block_view($delta) {
 
   // Show Username? Trim long usernames
    $userlen=variable_get('user_picture_userlen', 10);
-   $userdisp=$user->name;
-   if (strlen($user->name) > $userlen) {
-     $userdisp=substr($user->name, 0, $userlen) . '..';
+   $userdisp=$puser->name;
+   if (strlen($puser->name) > $userlen) {
+     $userdisp=substr($puser->name, 0, $userlen) . '..';
    }
    if (variable_get('user_block_showuser','1')=='1') {
-     $block['content'] .='<div class="user-info"><h3>' .l($userdisp, "user/$user->uid" ) . "</h3>";
+     $block['content'] .='<div class="user-info"><h3>' .l($userdisp, "user/$puser->uid" ) . "</h3>";
    }
-   user_build_content($user);
- $content=$user->content;
+   user_build_content($puser);
+ $content=$puser->content;
   if (isset($content['first_name']) || isset($content['last_name'])){
       $block['content'] .= "<div class=userlevel>" . $content['first_name'][0]['#markup'] .' '. $content['last_name'][0]['#markup']. "</div>";
   }
@@ -101,11 +105,17 @@ function user_block_block_view($delta) {
       $block['content'] .= "<div class=userlevel>" . $content['research_fields'][0]['#markup'] . "</div>";
   }
   if (isset($content['position'])||isset($content['institution'])) {
-      $block['content'] .= "<div class=userlevel>" . $content['position'][0]['#markup'];
+  	$block['content'] .= "<div class=userlevel>";  
+      if(isset($content['position'])){
+      	$block['content'] .= $content['position'][0]['#markup'];
+      }
       if(isset($content['position'])&& isset($content['institution'])){
       	$block['content'] .= ', ';
       }
-      $block['content'] .= $content['institution'][0]['#markup'] . "</div>";
+      if(isset($content['institution'])){
+      $block['content'] .= $content['institution'][0]['#markup'];
+      }
+      $block['content'] .= "</div>";
   }
   if (isset($content['country'])) {
       $block['content'] .= "<div class=userlevel>" . $content['country'][0]['#markup'] . "</div>";
