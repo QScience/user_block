@@ -23,5 +23,19 @@
 *+html .user_block h3 { /* IE7 */
   margin-top: 0.2em;
 }
+.user-score{
+	float:right;
+	right:5px;
+	padding:10px;
+	position:relative;
+	font-size:25px;
+	border: 1px solid #DCDCDC;
+	background: none repeat scroll 0 0 #FFFFFF;
+	text-align:center;
+}
+.content .user-score p{
+  font-size:15px;
+  margin-bottom: 10px;
+}
 
 

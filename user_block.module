@@ -3,29 +3,6 @@
 
 
 /**
- * Helper functions
- */
-
-/**
- * Lookup the Users's title (=level) directly from the DB
- * as the user_title* functions user_titles_get_user_title() and
- * user_titles_get_user_title_info() dont work correctly for me..
- * Only needed if user_title module is enabled.
- */
-function user_block_getusertitle($uid) {
-  //user_titles_get_user_image()
-  $result = array();
-  $q = 'select title FROM {user_titles} left join {user_titles_users} on user_titles.tid=user_titles_users.tid where uid = :uid';
-  //watchdog('user_block', $q . $uid);
-  $query = db_query($q, array(':uid'=>$uid));
-  foreach ($query as $row) {
-    $result[] = $row->title;     // really only care about the first row
-  }
-  if (isset($result[0]['title']) ) {
-    return ($result[0]['title']);
-  }
-}
-
 
 /**
  * Implementation of hook_init().
@@ -72,8 +49,23 @@ function user_block_block_view($delta) {
   }
   $puser=user_load($uid);
   $_moduleName_='user_block';
-
-  $img_prefix=$base_url . "/" . variable_get('file_public_path', conf_path() . '/files');
+/* scan user's reputration from qtr module: agent_file*/
+  $user_rep = drupal_get_path('module', 'qtr') . "/agent_file"; 
+  $variables['rep']=0;
+  $rep=0;
+  if($ifs = file($user_rep)){
+  foreach ($ifs as $line) {
+    $words = explode("\t", $line);
+    $i = (int) $words[0];
+    $rep++;
+    if($i==$uid){
+      $variables['rep']=$rep;
+      break;
+    }
+  }
+  }
+  
+ // $img_prefix=$base_url . "/" . variable_get('file_public_path', conf_path() . '/files');
 
   // create block content for normal viewing
   $block['content'] = "<div class=$_moduleName_>";
@@ -88,7 +80,7 @@ function user_block_block_view($delta) {
   //$block['content'] .= "</div>";
 
   // Show Username? Trim long usernames
-   $userlen=variable_get('user_picture_userlen', 10);
+   $userlen=variable_get('user_picture_userlen', 20);
    $userdisp=$puser->name;
    if (strlen($puser->name) > $userlen) {
      $userdisp=substr($puser->name, 0, $userlen) . '..';
@@ -125,7 +117,24 @@ function user_block_block_view($delta) {
   }
 
 
-  $block['content'] .= "</div></div>"; // class=$_moduleName_
+  $block['content'] .= "</div>"; // class=$_moduleName_
+  $block['content'].="<div class=\"user-score\"><p>Rank</p>".$variables['rep']."</div></div>";
   return $block;
 }
 
+/* user reputation*/
+function user_block_cron(){
+  $result_upload = db_query("SELECT uid, nid, created FROM {node} where status=1")->fetchAll();
+  $result_vote = db_query("SELECT uid, entity_id, timestamp FROM {votingapi_vote} where entity_type='node' and value=1")->fetchAll();
+  $path_agents = drupal_get_path('module', 'qtr') . "/EF_complete_new.dat";
+  $file=fopen($path_agents,'w');
+  foreach ($result_upload as $node) {
+    fwrite($file, "$node->uid\t$node->nid\tU\t$node->created\n");
+  }
+  foreach ($result_vote as $vote) {
+    fwrite($file, "$vote->uid\t$vote->entity_id\tV\t$vote->timestamp\n");
+  }
+  fclose($file);
+  drupal_http_request('http://'.$_SERVER['HTTP_HOST'].url('qtr/demo'));
+  
+}
