@@ -53,7 +53,8 @@ function user_block_block_view($delta) {
   $user_rep = drupal_get_path('module', 'qtr') . "/agent_file"; 
   $variables['rep']=0;
   $rep=0;
-  if($ifs = file($user_rep)){
+  if(file_exists($user_rep)){
+  $ifs = file($user_rep);
   foreach ($ifs as $line) {
     $words = explode("\t", $line);
     $i = (int) $words[0];
@@ -121,9 +122,9 @@ function user_block_block_view($delta) {
   $block['content'].="<div class=\"user-score\"><p>Rank</p>".$variables['rep']."</div></div>";
   return $block;
 }
-
 /* user reputation*/
 function user_block_cron(){
+   global $user;
   $result_upload = db_query("SELECT uid, nid, created FROM {node} where status=1")->fetchAll();
   $result_vote = db_query("SELECT uid, entity_id, timestamp FROM {votingapi_vote} where entity_type='node' and value=1")->fetchAll();
   $path_agents = drupal_get_path('module', 'qtr') . "/EF_complete_new.dat";
@@ -135,6 +136,8 @@ function user_block_cron(){
     fwrite($file, "$vote->uid\t$vote->entity_id\tV\t$vote->timestamp\n");
   }
   fclose($file);
-  drupal_http_request('http://'.$_SERVER['HTTP_HOST'].url('qtr/demo'));
+  module_load_include('module', 'qtr','qtr');
+  qtr_demo();
+//  drupal_http_request('http://'.$_SERVER['HTTP_HOST'].url('qtr/demo'));
   
 }
