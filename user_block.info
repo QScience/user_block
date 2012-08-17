@@ -4,5 +4,4 @@ configure = admin/structure/block
 package = "User interface"
 version = "7.x-1.x-dev"
 core = "7.x"
-dependencies[] = plus1
 dependencies[] = qtr

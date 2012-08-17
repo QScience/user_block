@@ -25,6 +25,48 @@ function user_block_block_info() {
   return $blocks;
 }
 
+/*
+ * Implements hook_block_configure
+ */
+function user_block_block_configure($delta = '') {
+  if ($delta == 'user-block') {
+  	 $radio['rank_type_num'] = array(
+      '#type' => 'radio',
+      '#title' => t('Show user\'s rank with the formate of rank number'),
+      '#description' =>  NULL,
+      '#return_value' => 'num',
+      '#default_value' => variable_get('rank_type','percent'),
+	  '#parents' => array('rank_type'),
+    );
+     $radio['rank_type_percent'] = array(
+      '#type' => 'radio',
+      '#title' => t('Show user\'s rank with the formate of percentage'),
+      '#description' =>  NULL,
+      '#return_value' => 'percent',
+      '#default_value' => variable_get('rank_type','percent'),
+      '#parents' => array('rank_type'),
+    );
+  	$form['rank_type'] = array(
+    '#type' => 'item',
+    '#title' => t('Select a rank type to display in this block'),
+  	);
+  	$form['rank_type'] += $radio;
+  	
+   
+    return $form;
+  }
+}
+  
+/*
+ * Implements hook_block_save
+ */
+function user_block_block_save($delta, $edit = array()) {
+  if ($delta == 'user-block') {
+   variable_set('rank_type',$edit['rank_type']);
+  }
+}
+
+
 
 /**
  * Implements hook_block_view().
@@ -49,21 +91,11 @@ function user_block_block_view($delta) {
   }
   $puser=user_load($uid);
   $_moduleName_='user_block';
-/* scan user's reputration from qtr module: agent_file*/
-  $user_rep = drupal_get_path('module', 'qtr') . "/agent_file"; 
-  $variables['rep']=0;
-  $rep=0;
-  if(file_exists($user_rep)){
-  $ifs = file($user_rep);
-  foreach ($ifs as $line) {
-    $words = explode("\t", $line);
-    $i = (int) $words[0];
-    $rep++;
-    if($i==$uid){
-      $variables['rep']=$rep;
-      break;
-    }
-  }
+/* scan user's reputration*/ 
+  $variables['rep']= qtr_get_value('qtr_reputation','rank',$uid);
+  $count = db_query("SELECT COUNT(*) FROM {users}")->fetchCol();
+  if(!$variables['rep']){
+   	$variables['rep']=$count;
   }
   
  // $img_prefix=$base_url . "/" . variable_get('file_public_path', conf_path() . '/files');
@@ -119,25 +151,12 @@ function user_block_block_view($delta) {
 
 
   $block['content'] .= "</div>"; // class=$_moduleName_
-  $block['content'].="<div class=\"user-score\"><p>Rank</p>".$variables['rep']."</div></div>";
+  $block['content'].="<div class=\"user-score\"><p>Top</p>";
+  if(variable_get('rank_type','percent')=='num'){
+  	$block['content'].=$variables['rep'][0];
+  }else{
+  	$block['content'].= 100*$variables['rep'][0]/$count[0].'%';
+  }
+  $block['content'].="</div></div>";
   return $block;
-}
-/* user reputation*/
-function user_block_cron(){
-   global $user;
-  $result_upload = db_query("SELECT uid, nid, created FROM {node} where status=1")->fetchAll();
-  $result_vote = db_query("SELECT uid, entity_id, timestamp FROM {votingapi_vote} where entity_type='node' and value=1")->fetchAll();
-  $path_agents = drupal_get_path('module', 'qtr') . "/EF_complete_new.dat";
-  $file=fopen($path_agents,'w');
-  foreach ($result_upload as $node) {
-    fwrite($file, "$node->uid\t$node->nid\tU\t$node->created\n");
-  }
-  foreach ($result_vote as $vote) {
-    fwrite($file, "$vote->uid\t$vote->entity_id\tV\t$vote->timestamp\n");
-  }
-  fclose($file);
-  module_load_include('module', 'qtr','qtr');
-  qtr_demo();
-//  drupal_http_request('http://'.$_SERVER['HTTP_HOST'].url('qtr/demo'));
-  
 }
