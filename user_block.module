@@ -155,7 +155,7 @@ function user_block_block_view($delta) {
   if(variable_get('rank_type','percent')=='num'){
   	$block['content'].=$variables['rep'][0];
   }else{
-  	$block['content'].= 100*$variables['rep'][0]/$count[0].'%';
+  	$block['content'].= ceil(100*$variables['rep'][0]/$count[0]).'%';
   }
   $block['content'].="</div></div>";
   return $block;
