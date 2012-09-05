@@ -91,12 +91,6 @@ function user_block_block_view($delta) {
   }
   $puser=user_load($uid);
   $_moduleName_='user_block';
-/* scan user's reputration*/ 
-  $variables['rep']= qtr_get_value('qtr_reputation','rank',$uid);
-  $count = db_query("SELECT COUNT(*) FROM {users}")->fetchCol();
-  if(!$variables['rep']){
-   	$variables['rep']=$count;
-  }
   
  // $img_prefix=$base_url . "/" . variable_get('file_public_path', conf_path() . '/files');
 
@@ -121,7 +115,14 @@ function user_block_block_view($delta) {
    if (variable_get('user_block_showuser','1')=='1') {
      $block['content'] .='<div class="user-info"><h3>' .l($userdisp, "user/$puser->uid" ) . "</h3>";
    }
-   user_build_content($puser);
+   
+    $langcode = $GLOBALS['language_content']->language;
+   $puser->content = array();
+   // Build fields content.
+  field_attach_prepare_view('user', array($puser->uid => $puser), 'full', $langcode);
+  entity_prepare_view('user', array($puser->uid => $puser), $langcode);
+  $puser->content += field_attach_view('user', $puser, 'full', $langcode);
+   module_invoke('profile', 'user_view',$puser, 'full', $langcode); //profile_user_view($puser);  
  $content=$puser->content;
   if (isset($content['first_name']) || isset($content['last_name'])){
       $block['content'] .= "<div class=userlevel>" . $content['first_name'][0]['#markup'] .' '. $content['last_name'][0]['#markup']. "</div>";
@@ -153,10 +154,28 @@ function user_block_block_view($delta) {
   $block['content'] .= "</div>"; // class=$_moduleName_
   $block['content'].="<div class=\"user-score\"><p>Top</p>";
   if(variable_get('rank_type','percent')=='num'){
-  	$block['content'].=$variables['rep'][0];
+  	  $variables['rank']= qtr_get_value('qtr_reputation','rank',$uid);
+  	$block['content'].=$variables['rank']?$variables['rank'][0]:'&#8734;';
   }else{
-  	$block['content'].= ceil(100*$variables['rep'][0]/$count[0]).'%';
+  	 $variables['rep']= qtr_get_value('qtr_reputation','percentile',$uid);
+  	$block['content'].= $variables['rep']?ceil(100*$variables['rep'][0]).'%':"100%";
   }
   $block['content'].="</div></div>";
   return $block;
 }
+
+/**
+ * Implements hook_user_view().
+ */
+ 
+ function user_block_user_view($account){
+ 	$chart=render(qtr_chart_reputation($account->uid));
+ 	 $account->content['Reputation History'] = array(
+        '#type' => 'user_profile_item', 
+        '#title' => "Reputation Over Time", 
+        '#markup'=>$chart,
+        '#weight' => 100, 
+        '#attributes' => array('class' => array('profile-qtr-history')),
+      );
+ }
+ 
