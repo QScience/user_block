@@ -178,4 +178,22 @@ function user_block_block_view($delta) {
         '#attributes' => array('class' => array('profile-qtr-history')),
       );
  }
- 
+ /*
+  * Implements MODULE_preprocess_HOOK().
+  */
+ function user_block_preprocess_user_profile(&$variables) {
+  $account = $variables['elements']['#account'];
+  $querypost = db_select('node', 'n')
+  			->fields('n',array('nid'))->condition('n.uid', $account->uid)->condition('n.promote', 1)->condition('n.status', 1)
+    ->condition('n.type', array('paper','paper_from_arxiv','news','event','editorial','bookreview'),'in')->execute()->rowCount();
+  $queryblog = db_select('node', 'n')
+  			->fields('n',array('nid'))->condition('n.uid', $account->uid)->condition('n.promote', 1)
+    ->condition('n.status', 1)
+    ->condition('n.type', 'blog')->execute()->rowCount();
+    $querycomment = db_select('comment', 'c')
+  			->fields('c',array('cid'))->condition('c.uid', $account->uid)
+    ->condition('c.status', 1)->execute()->rowCount();
+ 	$variables['historyNo']['post']=$querypost;
+ 	$variables['historyNo']['comment']=$querycomment;
+ 	$variables['historyNo']['blog']=$queryblog;
+}
