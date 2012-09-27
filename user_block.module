@@ -153,6 +153,8 @@ function user_block_block_view($delta) {
 
   $block['content'] .= "</div>"; // class=$_moduleName_
   $block['content'].="<div class=\"user-score\"><p>Top</p>";
+ 
+  
   if(variable_get('rank_type','percent')=='num'){
   	  $variables['rank']= qtr_get_value('qtr_reputation','rank',$uid);
   	$block['content'].=$variables['rank']?$variables['rank'][0]:'&#8734;';
@@ -160,6 +162,8 @@ function user_block_block_view($delta) {
   	 $variables['rep']= qtr_get_value('qtr_reputation','percentile',$uid);
   	$block['content'].= $variables['rep']?ceil(100*$variables['rep'][0]).'%':"100%";
   }
+ /* $block['content'].=" <div class=\"user-history\"> <a href="*">History of contributions</a></div>";*/
+
   $block['content'].="</div></div>";
   return $block;
 }
