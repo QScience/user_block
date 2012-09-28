@@ -95,7 +95,7 @@ function user_block_block_view($delta) {
  // $img_prefix=$base_url . "/" . variable_get('file_public_path', conf_path() . '/files');
 
   // create block content for normal viewing
-  $block['content'] = "<div class=$_moduleName_>";
+  $block['content'] = '<div class='.$_moduleName_.'> ';
 
   
 
@@ -103,7 +103,19 @@ function user_block_block_view($delta) {
   $variables['user_picture'] = '';
   template_preprocess_user_picture($variables);
   //$block['content'] .= "<div class=picture>";
-  $block['content'] .= $variables['user_picture'];
+  $block['content'] .= '<div class="user_pic">'.$variables['user_picture'];
+  
+    $block['content'].="<div class=\"user-score\"><h4>Top ";
+ 
+  
+  if(variable_get('rank_type','percent')=='num'){
+  	  $variables['rank']= qtr_get_value('qtr_reputation','rank',$uid);
+  	$block['content'].=$variables['rank']?$variables['rank'][0]:'&#8734;';
+  }else{
+  	 $variables['rep']= qtr_get_value('qtr_reputation','percentile',$uid);
+  	$block['content'].= $variables['rep']?ceil(100*$variables['rep'][0]).'%':"100%";
+  }
+   $block['content'].='</h4></div></div>';
   //$block['content'] .= "</div>";
 
   // Show Username? Trim long usernames
@@ -152,19 +164,9 @@ function user_block_block_view($delta) {
 
 
   $block['content'] .= "</div>"; // class=$_moduleName_
-  $block['content'].="<div class=\"user-score\"><p>Top</p>";
- 
-  
-  if(variable_get('rank_type','percent')=='num'){
-  	  $variables['rank']= qtr_get_value('qtr_reputation','rank',$uid);
-  	$block['content'].=$variables['rank']?$variables['rank'][0]:'&#8734;';
-  }else{
-  	 $variables['rep']= qtr_get_value('qtr_reputation','percentile',$uid);
-  	$block['content'].= $variables['rep']?ceil(100*$variables['rep'][0]).'%':"100%";
-  }
-  $block['content'].=' <div class="user-history"><a href="'.url('user/'.$puser->uid).'">History of contributions</a></div>';
+  $block['content'].=' <div class="user-history"><h2><a href="'.url('user/'.$puser->uid).'">History of contributions</a></h2></div>';
 
-  $block['content'].="</div></div>";
+  $block['content'].="</div>";
   return $block;
 }
 
