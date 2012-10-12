@@ -164,7 +164,7 @@ function user_block_block_view($delta) {
 
 
   $block['content'] .= "</div>"; // class=$_moduleName_
-  $block['content'].=' <div class="user-history"><h2><a href="'.url('user/'.$puser->uid).'">History of contributions</a></h2></div>';
+  $block['content'].=' <div class="user-history"><h2><a href="'.url('user/'.$puser->uid).'#history">History of contributions</a></h2></div>';
 
   $block['content'].="</div>";
   return $block;
