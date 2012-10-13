@@ -182,7 +182,7 @@ function user_block_block_view($delta) {
  	$chart=render(qtr_chart_reputation($account->uid));
  	 $account->content['Reputation History'] = array(
         '#type' => 'user_profile_item', 
-        '#title' => "Reputation Over Time", 
+        '#title' => "", //Reputation Over Time
         '#markup'=>$chart,
         '#weight' => 100, 
         '#attributes' => array('class' => array('profile-qtr-history')),
