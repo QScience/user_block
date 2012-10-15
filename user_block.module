@@ -142,18 +142,13 @@ function user_block_block_view($delta) {
 //  if (isset($content['research_fields'])) {
 //     $block['content'] .= "<div class=userlevel>" . $content['research_fields'][0]['#markup'] . "</div>";
 //  }
-  if (isset($content['position'])||isset($content['institution'])) {
+  if (isset($content['position'])) {
   	$block['content'] .= "<div class=userlevel>";  
-      if(isset($content['position'])){
       	$block['content'] .= $content['position'][0]['#markup'];
-      }
-      if(isset($content['position'])&& isset($content['institution'])){
-      	$block['content'] .= ', ';
-      }
-      if(isset($content['institution'])){
-      $block['content'] .= $content['institution'][0]['#markup'];
-      }
       $block['content'] .= "</div>";
+  }
+  if(isset($content['field_institution'])){
+  	$block['content'] .= "<div class=userlevel>" . $content['field_institution'][0]['#markup'] . "</div>";
   }
   if (isset($content['country'])) {
       $block['content'] .= "<div class=userlevel>" . $content['country'][0]['#markup'] . "</div>";
