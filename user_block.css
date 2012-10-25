@@ -38,7 +38,6 @@
   margin-top: -18px;
 }
 .user-score{
-	padding-left:10px;
 	/*position:relative;*/
 	font-size:15px;
 	background: none repeat scroll 0 0 #FFFFFF;
@@ -58,12 +57,12 @@
 	margin-top:15px
 }
 .user_block .profile_link a {
-    background: url("profile_link_bg.png") no-repeat scroll 0 0 transparent;
+  /*  background: url("profile_link_bg.png") no-repeat scroll 0 0 transparent;*/
     display: block;
     font-size: 14px;
-    height: 28px;
+    height: 20px;
     line-height: 28px;
-    margin-bottom: 5px;
+    margin-top: 5px;
     padding-left: 12px;
 }
 .profile_link{

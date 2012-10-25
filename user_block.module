@@ -115,7 +115,8 @@ function user_block_block_view($delta) {
   	 $variables['rep']= qtr_get_value('qtr_reputation','percentile',$uid);
   	$block['content'].= $variables['rep']?ceil(100*$variables['rep'][0]).'%':"100%";
   }
-   $block['content'].='</h4></div></div>';
+   $block['content'].='</h4><a class="help-icon" title="User reputation values are computed on the basis of user actions on this web site. Submitting a paper, a blog post, or a news viewed by many other users all helps to increase your reputation. If user X is displayed to have reputation top 90%, this means that 90% of all users are of lesser reputation than user X.">
+?</a></div></div>';
   //$block['content'] .= "</div>";
 
   // Show Username? Trim long usernames
@@ -160,10 +161,17 @@ function user_block_block_view($delta) {
 
   $block['content'] .= "</div>"; // class=$_moduleName_
  // $block['content'].=' <div class="user-history"><h2><a href="'.url('user/'.$puser->uid).'#history">History of contributions</a></h2></div>';
+ if($user->uid==$puser->uid){
+ 	 $block['content'].='<div class="profile_link">
+							<a href="'.url('user/'.$puser->uid).'#history">My contributions</a>
+							<a href="'.url('blogs/'.$puser->name).'">My blogs</a>
+						</div>';
+ }else{
   $block['content'].='<div class="profile_link">
 							<a href="'.url('user/'.$puser->uid).'#history">'.$puser->name.'\'s contributions</a>
 							<a href="'.url('blogs/'.$puser->name).'">'.$puser->name.'\'s blogs</a>
 						</div>';
+ }
 
   $block['content'].="</div>";
   return $block;
