@@ -105,18 +105,20 @@ function user_block_block_view($delta) {
   //$block['content'] .= "<div class=picture>";
   $block['content'] .= '<div class="user_pic">'.$variables['user_picture'];
   
-    $block['content'].="<div class=\"user-score\"><h4>Top ";
+    $block['content'].="<div class=\"user-score\"><h4>";
  
   
   if(variable_get('rank_type','percent')=='num'){
   	  $variables['rank']= qtr_get_value('qtr_reputation','rank',$uid);
   	$block['content'].=$variables['rank']?$variables['rank'][0]:'&#8734;';
+  	$block['content'].='</h4></div></div>';
   }else{
   	 $variables['rep']= qtr_get_value('qtr_reputation','percentile',$uid);
-  	$block['content'].= $variables['rep']?ceil(100*$variables['rep'][0]).'%':"100%";
+  	$block['content'].= $variables['rep']?ceil(100*(1-$variables['rep'][0])).'%':"0%";
+  	$block['content'].='</h4><a class="help-icon" title="User reputation values are computed on the basis of user actions on this web site. Submitting a paper, a blog post, or a news viewed by many other users all helps to increase your reputation. If user X is displayed to have reputation top 90%, this means that 90% of all users are of lesser reputation than user X.">
+	?</a></div></div>';
   }
-   $block['content'].='</h4><a class="help-icon" title="User reputation values are computed on the basis of user actions on this web site. Submitting a paper, a blog post, or a news viewed by many other users all helps to increase your reputation. If user X is displayed to have reputation top 90%, this means that 90% of all users are of lesser reputation than user X.">
-?</a></div></div>';
+   
   //$block['content'] .= "</div>";
 
   // Show Username? Trim long usernames
