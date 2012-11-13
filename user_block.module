@@ -165,12 +165,12 @@ function user_block_block_view($delta) {
  // $block['content'].=' <div class="user-history"><h2><a href="'.url('user/'.$puser->uid).'#history">History of contributions</a></h2></div>';
  if($user->uid==$puser->uid){
  	 $block['content'].='<div class="profile_link">
-							<a href="'.url('user/'.$puser->uid).'#history">My contributions</a>
+							<a href="'.url('user-history/'.$puser->name).'">My contributions</a>
 							<a href="'.url('blogs/'.$puser->name).'">My blogs</a>
 						</div>';
  }else{
   $block['content'].='<div class="profile_link">
-							<a href="'.url('user-history/'.$puser->uid).'#history">'.$puser->name.'\'s contributions</a>
+							<a href="'.url('user-history/'.$puser->name).'">'.$puser->name.'\'s contributions</a>
 							<a href="'.url('blogs/'.$puser->name).'">'.$puser->name.'\'s blogs</a>
 						</div>';
  }
