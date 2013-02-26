@@ -156,9 +156,9 @@ function user_block_block_view($delta) {
   if (isset($content['country'])) {
       $block['content'] .= "<div class=userlevel>" . $content['country'][0]['#markup'] . "</div>";
   }
-  if (isset($content['website'])) {
-      $block['content'] .= '<div class=userlevel>' . $content['website'][0]['#markup'] . "</div>";
-  }
+ // if (isset($content['website'])) {
+ //     $block['content'] .= '<div class=userlevel>' . $content['website'][0]['#markup'] . "</div>";
+ // }
 
 
   $block['content'] .= "</div>"; // class=$_moduleName_
